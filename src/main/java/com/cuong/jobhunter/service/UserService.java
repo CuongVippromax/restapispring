@@ -3,9 +3,14 @@ package com.cuong.jobhunter.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.cuong.jobhunter.domain.Company;
 import com.cuong.jobhunter.domain.User;
+import com.cuong.jobhunter.dto.Meta;
+import com.cuong.jobhunter.dto.ResultPaginationDTO;
 import com.cuong.jobhunter.repository.UserRepository;
 
 @Service
@@ -25,8 +30,18 @@ public class UserService {
         return newUser;
     }
 
-    public List<User> getAllUser() {
-        return this.userRepository.findAll();
+    public ResultPaginationDTO getAllUser(Pageable pageable) {
+        Page<User> pageUser = this.userRepository.findAll(pageable);
+        ResultPaginationDTO resultPaginationDTO = new ResultPaginationDTO();
+        Meta mt = new Meta();
+        mt.setPage(pageUser.getNumber());
+        mt.setPageSize(pageUser.getSize());
+        mt.setPages(pageUser.getTotalPages());
+        mt.setTotal(pageUser.getTotalElements());
+
+        resultPaginationDTO.setMeta(mt);
+        resultPaginationDTO.setResult(pageUser.getContent());
+        return resultPaginationDTO;
     }
 
     public User getUserWithId(Long id) {

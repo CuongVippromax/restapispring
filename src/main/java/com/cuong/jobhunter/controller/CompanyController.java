@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,30 +16,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cuong.jobhunter.domain.User;
+import com.cuong.jobhunter.domain.Company;
 import com.cuong.jobhunter.dto.ResultPaginationDTO;
-import com.cuong.jobhunter.service.UserService;
+import com.cuong.jobhunter.service.CompanyService;
+
+import jakarta.validation.Valid;
 
 @RestController
-public class UserController {
-    private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
+public class CompanyController {
+    private final CompanyService companyService;
 
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
+    public CompanyController(CompanyService companyService) {
+        this.companyService = companyService;
     }
 
-    @PostMapping("/user")
-    public ResponseEntity<User> createNewUser(@RequestBody User user) {
-        String hashPassword = this.passwordEncoder.encode(user.getPassword());
-        user.setPassword(hashPassword);
-        User newUser = this.userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+    @PostMapping("/companies")
+    public ResponseEntity<Company> createCompany(@Valid @RequestBody Company company) {
+        Company newCompany = this.companyService.createCompany(company);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCompany);
     }
 
-    @GetMapping("/users")
-    public ResponseEntity<ResultPaginationDTO> getListUser(@RequestParam("current") Optional<String> currentOptional,
+    @GetMapping("/companies")
+    public ResponseEntity<ResultPaginationDTO> getAllCompany(@RequestParam("current") Optional<String> currentOptional,
             @RequestParam("pageSize") Optional<String> pageSizeOptional) {
         String sCurrent = currentOptional.isPresent() ? currentOptional.get() : null;
         String sPageSize = pageSizeOptional.isPresent() ? pageSizeOptional.get() : null;
@@ -49,26 +46,25 @@ public class UserController {
                                                                                                         // thamm số này
                                                                                                         // đang là
                                                                                                         // string
-        return ResponseEntity.ok().body(this.userService.getAllUser(pageable));
-        // return ResponseEntity.ok().body(users);
+        // return ResponseEntity.ok().body(companies);
+        return ResponseEntity.ok().body(this.companyService.getAllCompany(pageable));
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<User> getUserWithId(@PathVariable Long id) {
-        User user = this.userService.getUserWithId(id);
-        return ResponseEntity.ok().body(user);
+    @GetMapping("/companies/{id}")
+    public ResponseEntity<Company> getCompanywithId(@PathVariable long id) {
+        Company company = this.companyService.getCompany(id);
+        return ResponseEntity.ok().body(company);
     }
 
-    @PutMapping("/user/{id}")
-    public ResponseEntity<String> updateUser(@RequestBody User user, @PathVariable Long id) {
-        this.userService.updateUSer(user, id);
-        return ResponseEntity.ok().body("Update successfully");
+    @PutMapping("/companies/{id}")
+    public ResponseEntity<Company> updateCompany(@PathVariable long id, @RequestBody Company company) {
+        Company updatecompany = this.companyService.updateCompany(company);
+        return ResponseEntity.ok().body(updatecompany);
     }
 
-    @DeleteMapping("/user{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        this.userService.deleteUser(id);
-        return ResponseEntity.ok().body("Delete successfully !!!");
+    @DeleteMapping("/companies/{id}")
+    public ResponseEntity<String> deleteCompany(@PathVariable long id) {
+        this.companyService.deleteCompany(id);
+        return ResponseEntity.ok().body("Xoa thanh cong!!");
     }
-
 }
