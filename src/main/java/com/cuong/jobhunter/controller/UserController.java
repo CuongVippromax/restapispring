@@ -1,7 +1,11 @@
 package com.cuong.jobhunter.controller;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,10 +15,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cuong.jobhunter.domain.User;
+import com.cuong.jobhunter.dto.ResultPagination;
 import com.cuong.jobhunter.service.UserService;
+import com.turkraft.springfilter.boot.Filter;
 
 @RestController
 public class UserController {
@@ -35,9 +42,11 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getListUser() {
-        List<User> users = this.userService.getAllUser();
-        return ResponseEntity.ok().body(users);
+    public ResponseEntity<ResultPagination> getListUser(
+            @Filter Specification<User> spec,
+            Pageable pageable) {
+
+        return ResponseEntity.ok().body(this.userService.getAllUser(spec, pageable));
     }
 
     @GetMapping("/user/{id}")

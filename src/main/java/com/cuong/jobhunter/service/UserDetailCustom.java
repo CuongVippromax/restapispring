@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import org.springframework.security.core.userdetails.User;
+import com.cuong.jobhunter.domain.User;
 
 @Component("userDetailsService")
 public class UserDetailCustom implements UserDetailsService {
@@ -20,11 +20,8 @@ public class UserDetailCustom implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        com.cuong.jobhunter.domain.User user = this.userService.getUserByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Username và password không hợp lệ !");
-        }
-        return new User(user.getEmail(), user.getPassword(),
+        User user = this.userService.getUserByUsername(username);
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
     }
 
